@@ -1,14 +1,4 @@
 {
-  ("presets");
-  [
-    [
-      "@babel/preset-env",
-      {
-        targets: {
-          browsers: "> 0.25%, not dead",
-          node: "current",
-        },
-      },
-    ],
-  ];
+  ;('presets')
+  ;['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]]
 }

@@ -1,45 +1,70 @@
-import React from "react";
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types'
 
-import Task from "../task";
-import "./task-list.css";
+import Task from '../task'
 
-function TaskList({
-  todos,
-  onDeleted,
-  onToggleCompleted,
-  onToggleEdit,
-  setDescription,
-}) {
+import './task-list.css'
+
+function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel }) {
   const elements = todos.map((item) => {
-    const { id, ...itemProps } = item;
+    const { id, status, edit, label, created, error } = item
+
+    const changeClass = () => {
+      let classList = 'todo-item '
+      if (edit) {
+        classList += 'editing'
+      }
+      if (status) {
+        classList += 'completed'
+      }
+      return classList
+    }
+    const headleSubmit = (e, identifier) => {
+      e.preventDefault()
+      onEdit(identifier)
+    }
+
+    const heandleChange = (e, identifier) => {
+      const text = e.target.value
+      changeLabel(text, identifier)
+    }
 
     return (
-      <Task
-        key={id}
-        {...itemProps}
-        onDeleted={() => onDeleted(id)}
-        onToggleCompleted={() => onToggleCompleted(id)}
-        onToggleEdit={() => onToggleEdit(id)}
-        setDescription={(description) => setDescription(item.id, description)}
-      />
-    );
-  });
-  return <ul className="todo-list">{elements}</ul>;
+      <li key={id} className={changeClass()}>
+        <Task
+          key={id}
+          onDeleted={() => onDeleted(id)}
+          onToggle={() => onToggle(id)}
+          status={status}
+          onEdit={() => onEdit(id)}
+          label={label}
+          created={created}
+        />
+        {edit && (
+          <form onSubmit={(e) => headleSubmit(e, id)}>
+            <input type="text" className="edit" value={label} onChange={(e) => heandleChange(e, id)} />
+            {error && <div className="error">Added text</div>}
+          </form>
+        )}
+      </li>
+    )
+  })
+  return <ul className="todo-list">{elements}</ul>
+}
+
+TaskList.defaultProps = {
+  // todos: [],
+  onEdit: () => {},
+  changeLabel: () => {},
+  onDeleted: () => {},
+  onToggle: () => {},
 }
 
 TaskList.propTypes = {
-  onDeleted: PropTypes.func.isRequired,
-  onToggleCompleted: PropTypes.func.isRequired,
-  onToggleEdit: PropTypes.func.isRequired,
-  setDescription: PropTypes.func.isRequired,
-  todos: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      description: PropTypes.string,
-      completed: PropTypes.bool.isRequired,
-    })
-  ).isRequired,
-};
+  // todos: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
+  onEdit: PropTypes.func,
+  changeLabel: PropTypes.func,
+  onDeleted: PropTypes.func,
+  onToggle: PropTypes.func,
+}
 
-export default TaskList;
+export default TaskList

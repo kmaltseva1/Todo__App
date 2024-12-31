@@ -1,102 +1,36 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
+import { formatDistanceToNow } from 'date-fns'
+import PropTypes from 'prop-types'
 
-// import { formatDistanceToNow } from "date-fns";
+export default function Task({ label, onDeleted, onToggle, status, onEdit, created }) {
+  const timeAgo = formatDistanceToNow(created, { includeSeconds: true })
 
-export default class Task extends Component {
-  constructor() {
-    super();
-    this.state = {
-      value: "",
-    };
-
-    this.onDescriptionChange = (event) => {
-      this.setState({
-        value: event.target.value,
-      });
-    };
-
-    this.taskEdit = () => {
-      if (this.props.edit) {
-        this.props.setDescription(this.state.value);
-      }
-    };
-
-    this.keydownEditHandle = (event) => {
-      if (event.key === "Enter") {
-        this.taskEdit(event);
-      }
-    };
-    document.addEventListener("keydown", this.keydownEditHandle);
-  }
-
-  render() {
-    const {
-      description,
-      id,
-      completed,
-      // created,
-      edit,
-      onDeleted,
-      onToggleCompleted,
-      onToggleEdit,
-    } = this.props;
-    let classNames = "";
-    if (completed) {
-      classNames = "completed";
-    }
-
-    if (edit) {
-      classNames = "editing";
-    }
-
-    return (
-      <li key={id} className={classNames}>
-        <div className="view">
-          <input
-            className="toggle"
-            type="checkbox"
-            checked={completed}
-            onChange={onToggleCompleted}
-          />
-          <label>
-            <span className="description">{description}</span>
-            {/* <span className="created">{formatDistanceToNow()}</span> */}
-          </label>
-          <button
-            type="button"
-            className="icon icon-edit"
-            onClick={onToggleEdit}
-            aria-label="editing task"
-          />
-
-          <button
-            type="button"
-            className="icon icon-destroy"
-            onClick={onDeleted}
-            aria-label={onDeleted}
-          />
-        </div>
-        <input
-          type="text"
-          className="edit"
-          value={this.state.value}
-          onChange={this.onDescriptionChange}
-        />
-      </li>
-    );
-  }
+  return (
+    <div className="view">
+      <input className="toggle" type="checkbox" onChange={onToggle} checked={status} />
+      <label htmlFor="username">
+        <span id="username" className="description">
+          {label}
+        </span>
+        <span className="created">created {timeAgo} ago</span>
+      </label>
+      <button type="button" className="icon icon-edit" onClick={onEdit} aria-label="edit" />
+      <button type="button" className="icon icon-destroy" onClick={onDeleted} aria-label="destroy" />
+    </div>
+  )
 }
 
 Task.defaultProps = {
-  description: "Default content",
-};
+  status: false,
+  label: '',
+  onDeleted: () => {},
+  onToggle: () => {},
+  onEdit: () => {},
+}
 
 Task.propTypes = {
-  description: PropTypes.string,
-  completed: PropTypes.bool.isRequired,
-  onDeleted: PropTypes.func.isRequired,
-  onToggleCompleted: PropTypes.func.isRequired,
-  onToggleEdit: PropTypes.func.isRequired,
-  setDescription: PropTypes.func.isRequired,
-};
+  status: PropTypes.bool,
+  label: PropTypes.string,
+  onDeleted: PropTypes.func,
+  onToggle: PropTypes.func,
+  onEdit: PropTypes.func,
+}
