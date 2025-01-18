@@ -14,22 +14,6 @@
 	border-bottom: none;
 }
 
-.todo-list li.editing {
-	border-bottom: none;
-	padding: 0;
-}
-
-.todo-list li.editing .edit {
-	display: block;
-	width: calc(100% - 43px);
-	padding: 12px 16px;
-	margin: 0 0 0 43px;
-}
-
-.todo-list li.editing .view {
-	display: none;
-}
-
 .todo-list li .toggle {
 	text-align: center;
 	width: 40px;
@@ -50,10 +34,6 @@
 }
 
 .todo-list li .toggle + label {
-	/*
-		Firefox requires `#` to be escaped - https://bugzilla.mozilla.org/show_bug.cgi?id=922433
-		IE and Edge requires *everything* to be escaped to render, so we do that instead of just the `#` - https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7157459/
-	*/
 	background-image: url('data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%2240%22%20height%3D%2240%22%20viewBox%3D%22-10%20-18%20100%20135%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2250%22%20fill%3D%22none%22%20stroke%3D%22%23ededed%22%20stroke-width%3D%223%22/%3E%3C/svg%3E');
 	background-repeat: no-repeat;
 	background-position: center left;
@@ -70,34 +50,36 @@
 	padding: 15px 85px 15px 60px;
 }
 
-.todo-list li label .created {
+.todo-list li .view {
+	position: relative;
+}
+
+.todo-list li label .description {
 	font-size: 13px;
 	color: gray;
 }
 
-.todo-list li label .description {
+.todo-list li label .title {
 	word-break: break-all;
 	display: block;
 	line-height: 1.2;
 	transition: color 0.4s;
 	font-weight: 400;
 	color: #4d4d4d;
+	max-width: 180px;
 }
 
-.todo-list li.completed label .description {
+.todo-list li.completed label .title {
 	color: #cdcdcd;
 	text-decoration: line-through;
 }
 
 .todo-list li .icon {
-	position: absolute;
-	top: 0;
-	bottom: -3px;
 	width: 30px;
 	height: 40px;
 	font-size: 34px;
 	color: #cc9a9a;
-	margin: auto 0 11px;
+	margin: auto 0;
 	transition: color 0.2s ease-out;
 	cursor: pointer;
 }
@@ -107,6 +89,9 @@
 }
 
 .todo-list li .icon-destroy {
+	position: absolute;
+	top: 0;
+	bottom: -3px;
 	right: 10px;
 }
 
@@ -115,12 +100,50 @@
 }
 
 .todo-list li .icon-edit {
+	position: absolute;
+	top: 0;
+	bottom: -3px;
 	font-size: 19px;
 	right: 45px;
 }
 
 .todo-list li .icon-edit:after {
 	content: '✎';
+}
+
+.todo-list li .icon-pause,
+.todo-list li .icon-play {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.todo-list li .icon-play {
+	font-size: 15px;
+	padding-right: 5px;
+}
+
+.icon-play:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.icon-pause:disabled {
+	opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.todo-list li .icon-pause {
+	font-size: 15px;
+	padding-right: 20px;
+}
+
+.icon-pause:after {
+	content: '⏸';
+}
+
+.icon-play:after {
+	content: '▶';
 }
 
 .todo-list li .edit {
@@ -131,42 +154,45 @@
 	margin-bottom: -1px;
 }
 
-.toggle-all {
-	width: 1px;
-	height: 1px;
-	border: none; /* Mobile Safari */
-	opacity: 0;
-	position: absolute;
-	right: 100%;
-	bottom: 100%;
+.todo-list li.editing {
+	border-bottom: none;
+	padding: 0;
 }
 
-.toggle-all + label {
-	width: 60px;
-	height: 34px;
-	font-size: 0;
-	position: absolute;
-	top: -52px;
-	left: -13px;
-	-webkit-transform: rotate(90deg);
-	transform: rotate(90deg);
+.todo-list li.editing .edit {
+	display: block;
+	width: calc(100% - 43px);
+	padding: 12px 16px;
+	margin: 0 0 0 43px;
 }
 
-.toggle-all + label:before {
-	content: '❯';
-	font-size: 22px;
-	color: #e6e6e6;
-	padding: 10px 27px 10px 27px;
+.todo-list li.editing .view {
+	display: none;
 }
 
-.toggle-all:checked + label:before {
-	color: #737373;
+.error {
+	margin-top: 10px;
+	padding-left: 45px;
+	font-size: 15px;
+	color: red;
 }
 
-/*
-	Hack to remove background from Mobile Safari.
-	Can't use it globally since it destroys checkboxes in Firefox
-*/
+.edit {
+	position: relative;
+	margin: 0;
+	width: 100%;
+	font-size: 24px;
+	font-family: inherit;
+	font-weight: inherit;
+	line-height: 1.4em;
+	color: inherit;
+	padding: 6px;
+	border: 1px solid #999;
+	box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2);
+	box-sizing: border-box;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 	.toggle-all,
 	.todo-list li .toggle {
