@@ -4,16 +4,21 @@ import Task from '../task'
 
 import './task-list.css'
 
-function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel }) {
+function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel, timer }) {
   const elements = todos.map((item) => {
-    const { id, status, edit, label, created, error } = item
+    const { id, edit, status, label, created, error, milliseconds } = item
+
+    if (milliseconds === 0 && !status) {
+      onToggle(id)
+    }
 
     const changeClass = () => {
       let classList = 'todo-item '
-      if (edit) {
+      if (status && edit) {
         classList += 'editing'
-      }
-      if (status) {
+      } else if (edit) {
+        classList += 'editing'
+      } else if (status) {
         classList += 'completed'
       }
       return classList
@@ -38,6 +43,8 @@ function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel }) {
           onEdit={() => onEdit(id)}
           label={label}
           created={created}
+          milliseconds={milliseconds}
+          timer={() => timer(id)}
         />
         {edit && (
           <form onSubmit={(e) => headleSubmit(e, id)}>

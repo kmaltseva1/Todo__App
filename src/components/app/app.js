@@ -3,6 +3,7 @@ import { Component } from 'react'
 import NewTaskForm from '../new-task-form'
 import TaskList from '../task-list'
 import Footer from '../footer'
+import convertInMillisec from '../../utils/convertInMillisec'
 
 import './app.css'
 
@@ -20,9 +21,10 @@ export default class App extends Component {
     }
   }
 
-  static createTodoItem(label, createdTime) {
+  static createTodoItem(label, milliseconds, createdTime) {
     const newItem = {
       label,
+      milliseconds,
       status: false,
       edit: false,
       id: Date.now(),
@@ -43,8 +45,7 @@ export default class App extends Component {
   get getComplited() {
     const { todoData } = this.state
     const doneCount = todoData.length ? todoData.filter((el) => el.status).length : []
-    const todoCount = todoData.length - doneCount
-    return todoCount
+    return todoData.length - doneCount
   }
 
   onFilterChange = (filter) => {
@@ -97,16 +98,26 @@ export default class App extends Component {
     })
   }
 
-  addItem = (text) => {
+  addItem = (text, min, sec) => {
     if (!text.trim()) {
       return
     }
-    const newItem = App.createTodoItem(text, Date.now())
+    const newItem = App.createTodoItem(text, convertInMillisec(min, sec), Date.now())
     this.setState(({ todoData }) => {
       const newArr = [...todoData, newItem]
       return {
         todoData: newArr,
       }
+    })
+  }
+
+  timer = (id) => {
+    this.setState(({ todoData }) => {
+      const index = todoData.findIndex((el) => el.id === id)
+      const el = todoData[index]
+      const newEl = { ...el, milliseconds: el.milliseconds - 1000 }
+      const render = [...todoData.slice(0, index), newEl, ...todoData.slice(index + 1)]
+      return { todoData: render }
     })
   }
 
@@ -136,6 +147,7 @@ export default class App extends Component {
             onToggle={this.toggleStatus}
             onEdit={this.editItem}
             changeLabel={this.changeLabel}
+            timer={this.timer}
           />
           <Footer
             getComplited={this.getComplited}
@@ -143,6 +155,7 @@ export default class App extends Component {
             filter={filter}
             onFilterChange={this.onFilterChange}
             deleteCompletedItems={this.deleteCompletedItems}
+            todos={visibleItems}
           />
         </section>
       </section>
