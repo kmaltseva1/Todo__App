@@ -13,9 +13,9 @@ export default class App extends Component {
       case 'all':
         return items
       case 'active':
-        return items.filter((item) => !item.status)
+        return items.filter((item) => !item.status && item.milliseconds > 0)
       case 'completed':
-        return items.filter((item) => item.status)
+        return items.filter((item) => item.status || item.milliseconds <= 0)
       default:
         return items
     }
@@ -30,6 +30,7 @@ export default class App extends Component {
       id: Date.now(),
       error: false,
       created: createdTime,
+      isRunning: false,
     }
     return newItem
   }
@@ -111,13 +112,40 @@ export default class App extends Component {
     })
   }
 
-  timer = (id) => {
+  timerRun = (id) => {
     this.setState(({ todoData }) => {
       const index = todoData.findIndex((el) => el.id === id)
       const el = todoData[index]
-      const newEl = { ...el, milliseconds: el.milliseconds - 1000 }
-      const render = [...todoData.slice(0, index), newEl, ...todoData.slice(index + 1)]
-      return { todoData: render }
+      if (el.milliseconds > 0 && !el.isRunning) {
+        const newEl = { ...el, isRunning: true }
+        const updatedData = [...todoData.slice(0, index), newEl, ...todoData.slice(index + 1)]
+        return { todoData: updatedData }
+      }
+      return { todoData }
+    })
+
+    const timerId = setInterval(() => {
+      this.setState(({ todoData }) => {
+        const index = todoData.findIndex((el) => el.id === id)
+        const el = todoData[index]
+        if (!el || el.milliseconds <= 0 || !el.isRunning) {
+          clearInterval(timerId)
+          return { todoData }
+        }
+        const updatedEl = { ...el, milliseconds: el.milliseconds - 1000 }
+        const updatedData = [...todoData.slice(0, index), updatedEl, ...todoData.slice(index + 1)]
+        return { todoData: updatedData }
+      })
+    }, 1000)
+  }
+
+  timerPause = (id) => {
+    this.setState(({ todoData }) => {
+      const index = todoData.findIndex((el) => el.id === id)
+      const el = todoData[index]
+      const newEl = { ...el, isRunning: false }
+      const updatedData = [...todoData.slice(0, index), newEl, ...todoData.slice(index + 1)]
+      return { todoData: updatedData }
     })
   }
 
@@ -147,7 +175,8 @@ export default class App extends Component {
             onToggle={this.toggleStatus}
             onEdit={this.editItem}
             changeLabel={this.changeLabel}
-            timer={this.timer}
+            timerRun={this.timerRun}
+            timerPause={this.timerPause}
           />
           <Footer
             getComplited={this.getComplited}

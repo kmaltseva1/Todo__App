@@ -4,9 +4,9 @@ import Task from '../task'
 
 import './task-list.css'
 
-function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel, timer }) {
+function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel, timerRun, timerPause }) {
   const elements = todos.map((item) => {
-    const { id, edit, status, label, created, error, milliseconds } = item
+    const { id, edit, status, label, created, error, milliseconds, isRunning } = item
 
     if (milliseconds === 0 && !status) {
       onToggle(id)
@@ -44,7 +44,9 @@ function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel, timer }) {
           label={label}
           created={created}
           milliseconds={milliseconds}
-          timer={() => timer(id)}
+          timerRun={() => timerRun(id)}
+          timerPause={() => timerPause(id)}
+          isRunning={isRunning}
         />
         {edit && (
           <form onSubmit={(e) => headleSubmit(e, id)}>
@@ -59,7 +61,7 @@ function TaskList({ todos, onDeleted, onToggle, onEdit, changeLabel, timer }) {
 }
 
 TaskList.defaultProps = {
-  // todos: [],
+  todos: [],
   onEdit: () => {},
   changeLabel: () => {},
   onDeleted: () => {},
@@ -67,7 +69,7 @@ TaskList.defaultProps = {
 }
 
 TaskList.propTypes = {
-  // todos: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
+  todos: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
   onEdit: PropTypes.func,
   changeLabel: PropTypes.func,
   onDeleted: PropTypes.func,
